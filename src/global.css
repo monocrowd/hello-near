@@ -186,3 +186,14 @@ aside footer *:last-child {
     box-shadow: 0 0 10em rgba(255, 255, 255, 0.02) inset;
   }
 }
+
+#instructions {
+	position: absolute;
+	color: #666;
+	bottom: 0;
+	padding-bottom: 6px;
+	font-family: sans-serif;
+	width: 100%;
+	text-align: center;
+	pointer-events: none;
+}
