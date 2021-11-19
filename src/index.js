@@ -16,32 +16,8 @@ document.querySelector('form').onsubmit = async (event) => {
   // get elements from the form using their id attribute
   const { fieldset, greeting } = event.target.elements
 
-  // disable the form while the value gets updated on-chain
-  fieldset.disabled = true
-
-  try {
-    // make an update call to the smart contract
-    await window.contract.set_greeting({
-      // pass the value that the user entered in the greeting field
-      message: greeting.value
-    })
-  } catch (e) {
-    alert(
-      'Something went wrong! ' +
-      'Maybe you need to sign out and back in? ' +
-      'Check your browser console for more info.'
-    )
-    throw e
-  } finally {
-    // re-enable the form, whether the call succeeded or failed
-    fieldset.disabled = false
-  }
-
-  // disable the save button, since it now matches the persisted value
-  submitButton.disabled = true
-
   // update the greeting in the UI
-  await fetchGreeting()
+  await fetchGreeting(greeting.value)
 
   // show notification
   document.querySelector('[data-behavior=notification]').style.display = 'block'
@@ -73,10 +49,6 @@ function signedOutFlow() {
 function signedInFlow() {
   document.querySelector('#signed-in-flow').style.display = 'block'
 
-  document.querySelectorAll('[data-behavior=account-id]').forEach(el => {
-    el.innerText = window.accountId
-  })
-
   // populate links in the notification box
   const accountLink = document.querySelector('[data-behavior=notification] a:nth-of-type(1)')
   accountLink.href = accountLink.href + window.accountId
@@ -89,16 +61,15 @@ function signedInFlow() {
   accountLink.href = accountLink.href.replace('testnet', networkId)
   contractLink.href = contractLink.href.replace('testnet', networkId)
 
-  fetchGreeting()
+  fetchGreeting(window.accountId)
 }
 
 // update global currentGreeting variable; update DOM with it
-async function fetchGreeting() {
-  currentGreeting = await contract.get_greeting({ account_id: window.accountId })
+async function fetchGreeting(name) {
+  currentGreeting = await contract.greet({ name: name })
   document.querySelectorAll('[data-behavior=greeting]').forEach(el => {
     // set divs, spans, etc
     el.innerText = currentGreeting
-
     // set input elements
     el.value = currentGreeting
   })
